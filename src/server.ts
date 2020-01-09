@@ -17,6 +17,6 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Register all routes
-Routes(app);
+const server = Routes(app);
 
-app.listen(port);
+server.listen(port);
