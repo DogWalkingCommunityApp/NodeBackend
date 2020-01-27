@@ -5,5 +5,7 @@ export default (app: IExpress) => {
   const controller = new UserInteractionsController();
 
   app.route('/login')
-    .get(controller.login);
+      .get(controller.login);
+  app.route('/test')
+      .get(controller.test);
 }
