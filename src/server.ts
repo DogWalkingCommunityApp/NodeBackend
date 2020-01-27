@@ -13,6 +13,8 @@ const app: IExpress = Express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use('/images', Express.static(__dirname + '/images'))
+
 // Cors for cross origin allowance
 app.use(cors());
 
