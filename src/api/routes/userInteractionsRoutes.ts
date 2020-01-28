@@ -6,6 +6,4 @@ export default (app: IExpress) => {
 
   app.route('/login')
       .get(controller.login);
-  app.route('/test')
-      .get(controller.test);
 }

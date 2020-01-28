@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import mongoDB from "./MongoDBConnection";
 
 class UserInteractionsController {
     constructor() {
@@ -7,10 +6,6 @@ class UserInteractionsController {
   
     public login = (req: Request, res: Response) => {
       res.send('not yet implemented')
-    }
-
-    public test = (req: Request, res: Response) => {
-        mongoDB.connect(req, res);
     }
   }
   

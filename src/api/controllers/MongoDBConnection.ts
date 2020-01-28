@@ -1,14 +1,28 @@
-import {Request, Response} from "express";
+const MongoClient = require('mongodb').MongoClient;
+let counter = 10000000;
+
+/*
+Aufbau der Datenbank:
+    DB's:
+        admin,
+        config,
+        local,
+        data -> Daten für die Anwendung
+         ->  Collections:
+                dogs,           -> Daten für die Hunde
+                routes,         -> Daten für die Routen
+                userprofile,    -> Daten für das Profil der User
+                userlogin       -> Daten für die Logindaten der User
+                counter         -> Speichert den ID Counter
+*/
 
 class MongoDBConnection {
     constructor() {
     }
 
-    public connect = (req: Request, res: Response) => {
-        var MongoClient = require('mongodb').MongoClient;
-
+    private connect = () => {
         //specify the connection URL
-        var url = 'mongodb://localhost:20000/';
+        const url = 'mongodb://localhost:20000/';
 
         let resolver;
         let rejecter;
@@ -21,50 +35,102 @@ class MongoDBConnection {
         MongoClient.connect(url, function (err, db) {
             console.log("Connected!");
 
-            var dbo = db.db("data");
-            //Querying for data in a MongoDB
-            //Using the find function to create a cursor of records
-            var cursor = dbo.collection('user').find();
+            const dbo = db.db("data");
 
-            resolver();
-
-            //For each record in the cursor we are calling a function
-            cursor.each(function (err, doc) {
-                console.log(doc);
-            });
-
-            //Closing the database Connection
-            db.close();
+            resolver(dbo);
         });
         return response;
     }
 
-    /*
-                //Inserting documents in a collection
-                    //Use the insertOne method to insert a document
-                    db.collection('user').insertOne({
-                        UserID: 1,
-                        UserName: "NewUser"
-                    });
+    public doesUserExist = async (username: string, email: string):Promise<boolean> => {
+        const connection:any = await  this.connect();
 
-                //Updating documents in a collection
-                    //Use the updateOne method
-                    db.collection('user').updateOne({
-                    "UserName": "NewUser" },
-                        {
-                            $set: {
-                                "UserName": "Johanna"
-                            }
-                    });
+        connection.collection("userprofile").findOne({}, function (err, result) {
+            if (err) throw err;
+            if (result.name === username || result.email === email)
+            {
+                return true;
+            }
+        });
 
-                //Deleting documents in a collection
-                    //Use the deleteOne method
-                    db.collection('user').deleteOne(
-                        {
-                            "UserName": "Johanna"
-                        }
-                    );
-                */
+        return false;
+    }
+
+    public addUserProfile = async (profileObject):Promise<boolean> => {
+        const connection: any = await this.connect();
+        profileObject.id = await this.getCounter();
+
+        connection.collection("userprofile").insertOne(profileObject);
+        this.updateCounter
+
+        connection.close();
+        return true;
+    }
+
+    public addUserLogin = async (username: string, password: string):Promise<boolean> => {
+        const connection: any = await this.connect();
+
+        connection.collection("userlogin").insertOne({
+            name: username,
+            password: password
+        });
+
+        connection.close();
+        return true;
+    }
+
+    public getCounter = async (): Promise<number> => {
+        const connection: any = await this.connect();
+
+        connection.collection("counter").findOne({}, function (err, result) {
+            if (err) throw err;
+            connection.close();
+
+            return result.counter;
+
+        });
+
+        return null;
+    }
+
+    public updateCounter = async (): Promise<number> => {
+        const connection: any = await this.connect();
+        counter++;
+        connection.collection("counter").updateOne({
+                "counter": "counter" },
+            {
+                $set: {
+                    "counter": counter
+                }
+            });
+        return counter;
+    }
+/*
+//Inserting documents in a collection
+    //Use the insertOne method to insert a document
+    db.collection('userprofile').insertOne({
+        id: 1,
+        name: "NewUser"
+    });
+
+//Updating documents in a collection
+    //Use the updateOne method
+    db.collection('userprofile').updateOne({
+    "name": "NewUser" },
+        {
+            $set: {
+                "name": "Johanna"
+            }
+    });
+
+//Deleting documents in a collection
+    //Use the deleteOne method
+    db.collection('userprofile').deleteOne(
+        {
+            "name": "Johanna"
+        }
+    );
+*/
 }
 
 const mongoDB = new MongoDBConnection();
