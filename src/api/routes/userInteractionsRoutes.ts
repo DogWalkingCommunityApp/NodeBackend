@@ -6,4 +6,7 @@ export default (app: IExpress) => {
 
   app.route('/login')
       .get(controller.login);
+
+  app.route('/register')
+      .post(controller.register)
 }

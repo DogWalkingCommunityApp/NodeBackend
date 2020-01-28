@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-let counter = 10000000;
+let counter;
 
 /*
 Aufbau der Datenbank:
@@ -37,65 +37,90 @@ class MongoDBConnection {
 
             const dbo = db.db("data");
 
-            resolver(dbo);
+            resolver({ connection: dbo, db });
         });
         return response;
     }
 
     public doesUserExist = async (username: string, email: string):Promise<boolean> => {
-        const connection:any = await  this.connect();
+        const { connection, db }:any = await  this.connect();
 
-        connection.collection("userprofile").findOne({}, function (err, result) {
+        let resolver, rejecter;
+
+        const response:Promise<boolean> = new Promise((res, rej) => resolver = res);
+
+        connection.collection("userprofile").findOne({
+            $or: [
+                { username: username },
+                { email: email }
+            ]
+        }, function (err, result) {
             if (err) throw err;
-            if (result.name === username || result.email === email)
+
+            if (result && (result.name === username || result.email === email))
             {
-                return true;
+                resolver(true);
+            } else {
+                resolver(false);
             }
         });
 
-        return false;
+        db.close();
+
+        return await response;
     }
 
     public addUserProfile = async (profileObject):Promise<boolean> => {
-        const connection: any = await this.connect();
-        profileObject.id = await this.getCounter();
+        const { connection, db }: any = await this.connect();
+        counter ? null : counter = await this.getCounter();
+        profileObject.id = counter;
+
+        counter++;
 
         connection.collection("userprofile").insertOne(profileObject);
-        this.updateCounter
+        this.updateCounter()
 
-        connection.close();
+        db.close();
         return true;
     }
 
     public addUserLogin = async (username: string, password: string):Promise<boolean> => {
-        const connection: any = await this.connect();
+        const { connection, db }: any = await this.connect();
+
+        //TODO: Create and add a salt to the entry. Hash the password with the salt
 
         connection.collection("userlogin").insertOne({
             name: username,
             password: password
         });
 
-        connection.close();
+        db.close();
         return true;
     }
 
     public getCounter = async (): Promise<number> => {
-        const connection: any = await this.connect();
+        const { connection, db }: any = await this.connect();
+
+        let resolver, rejecter;
+
+        const response:Promise<number> = new Promise((res, rej) => resolver = res)
 
         connection.collection("counter").findOne({}, function (err, result) {
             if (err) throw err;
-            connection.close();
+            db.close();
 
-            return result.counter;
+            resolver(result ? result.counter : 0);
 
         });
 
-        return null;
+        db.close();
+
+        return await response;
     }
 
     public updateCounter = async (): Promise<number> => {
-        const connection: any = await this.connect();
-        counter++;
+        const { connection, db }: any = await this.connect();
+
         connection.collection("counter").updateOne({
                 "counter": "counter" },
             {
@@ -103,6 +128,8 @@ class MongoDBConnection {
                     "counter": counter
                 }
             });
+
+        db.close
         return counter;
     }
 /*
