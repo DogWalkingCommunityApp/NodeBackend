@@ -18,6 +18,17 @@ Aufbau der Datenbank:
 
 class MongoDBConnection {
     constructor() {
+        this.connect().then(res => {
+            const { connection, db }:any = res;
+            connection.collection("counter").findOne({}, (err, result) => {
+                if (!result) {
+                    connection.collection("counter").insertOne({
+                        counter: 0
+                    });
+                }
+                db.close();
+            });
+        });
     }
 
     private connect = () => {
@@ -121,15 +132,13 @@ class MongoDBConnection {
     public updateCounter = async (): Promise<number> => {
         const { connection, db }: any = await this.connect();
 
-        connection.collection("counter").updateOne({
-                "counter": "counter" },
-            {
+        connection.collection("counter").updateOne({}, {
                 $set: {
                     "counter": counter
                 }
             });
 
-        db.close
+        db.close();
         return counter;
     }
 /*
