@@ -104,7 +104,7 @@ class MongoDBConnection {
         }, function (err, result) {
             if (err) throw err;
 
-            if (result && (result.name === username || result.email === email))
+            if (result && (result.username === username || result.email === email))
             {
                 resolver(result);
             } else {
