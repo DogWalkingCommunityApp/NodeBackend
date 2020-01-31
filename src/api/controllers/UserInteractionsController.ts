@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import MongoDBController from './MongoDBConnection';
 import mongoDB from './MongoDBConnection';
 
 class UserInteractionsController {
