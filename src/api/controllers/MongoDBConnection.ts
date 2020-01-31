@@ -226,7 +226,7 @@ class MongoDBConnection {
             email,
             selfDestructHandler: (setTimeout(() => {
                 delete this.authStore[authId];
-            }, defaultValidity) as unknown as number) 
+            }, defaultValidity*1000) as unknown as number) 
         }
 
         this.authStore[authId] = authToken;
