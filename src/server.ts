@@ -2,6 +2,7 @@ import * as Express from 'express';
 import { Express as IExpress } from 'express';
 import bodyParser = require('body-parser');
 import cors = require('cors');
+
 import Routes from './api/routes';
 
 const port: number = Number(process.env.PORT) || 3000; // port / default port
@@ -51,5 +52,6 @@ app.post('/sendNotification', (req, res) => {
 });
 // Register all routes
 const server = Routes(app);
+
 
 server.listen(port);
