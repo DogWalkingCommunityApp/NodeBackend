@@ -2,10 +2,8 @@ import * as Express from 'express';
 import { Express as IExpress } from 'express';
 import bodyParser = require('body-parser');
 import cors = require('cors');
-import nodemailer = require("nodemailer");
 
 import Routes from './api/routes';
-import * as fs from "fs";
 
 const port: number = Number(process.env.PORT) || 3000; // port / default port
 const notifications = [];
@@ -21,12 +19,9 @@ const app: IExpress = Express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-<<<<<<< HEAD
-=======
 const webpush = require('web-push');
 webpush.setVapidDetails('mailto:starwars.98@hotmail.de', PUBLIC_VAPID, PRIVATE_VAPID);
 
->>>>>>> master
 app.use('/images', Express.static(__dirname + '/images'));
 
 // Cors for cross origin allowance
@@ -58,11 +53,5 @@ app.post('/sendNotification', (req, res) => {
 // Register all routes
 const server = Routes(app);
 
-<<<<<<< HEAD
 
-
-
-
-=======
->>>>>>> master
 server.listen(port);
