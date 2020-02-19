@@ -8,8 +8,12 @@ export default (app: IExpress) => {
       .post(controller.login);
 
   app.route('/register')
+<<<<<<< HEAD
       .post(controller.register)
 
   // app.route('/passwordForgotten')
   //     .post(controller.passwordForgotten)
+=======
+      .post(controller.register);
+>>>>>>> master
 }
