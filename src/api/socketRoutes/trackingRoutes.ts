@@ -25,7 +25,12 @@ export default (socket: Socket) => {
                 trackingArray = undefined;
                 savedCountryName = undefined;
 
+                socket.removeAllListeners();
+
+                socket = undefined;
             })
+
+            // Start the tracking process for the user coordinates and send the positions of the surrounding cells
             socket.on('trackLocation', ({ lat, lng, jumpCell }) => {
                 if (jumpCell) {
                     trackingController.deleteCoordinates(cellKeyPath, savedCountryName, userId);
@@ -58,6 +63,8 @@ export default (socket: Socket) => {
 
                 socket.emit('trackLocationArray', trackingArray);
             })
+
+            // When stopping the tracking process, delete the coordinates from the grid and unset the vairables
             socket.on('stopTracking', () => {
                 if (cellKeyPath && userId && savedCountryName) {
                     trackingController.deleteCoordinates(cellKeyPath, savedCountryName, userId);
