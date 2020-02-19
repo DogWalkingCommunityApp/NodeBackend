@@ -31,6 +31,21 @@ class UserInteractionsController {
         res.send({success: false, message: 'User does already exist'})
       }
     }
+
+    // public passwordForgotten = async (req: Request, res: Response) => {
+    //     const sendmail = require('sendmail')({silent: true})
+    //
+    //     sendmail({
+    //         from: 'test@test.de',
+    //         to: 'jquednau@yahoo.com',
+    //         subject: 'MailComposer sendmail',
+    //         html: 'Mail of test sendmail '
+    //     }, function (err, reply) {
+    //         console.log(err && err.stack)
+    //         console.dir(reply)
+    //     })
+    // }
+
   }
   
   export default UserInteractionsController;
