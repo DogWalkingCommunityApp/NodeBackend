@@ -16,10 +16,24 @@ export default (socket: Socket) => {
             socket.emit('authenticateSocket', { success: true, message: 'Success!' })
 
             socket.on('disconnect', () => {
-                //  TODO: We have to clean up some data and remove the user from the tracking when being disconnected
+                if (cellKeyPath && userId && savedCountryName) {
+                    trackingController.deleteCoordinates(cellKeyPath, savedCountryName, userId);
+                }
+
+                cellKeyPath = undefined;
+                coordinates = undefined;
+                trackingArray = undefined;
+                savedCountryName = undefined;
+
             })
-            socket.on('trackLocation', ({ lat, lng }) => {
-                
+            socket.on('trackLocation', ({ lat, lng, jumpCell }) => {
+                if (jumpCell) {
+                    trackingController.deleteCoordinates(cellKeyPath, savedCountryName, userId);
+                    cellKeyPath = undefined;
+                    coordinates = undefined;
+                    trackingArray = undefined;
+                }
+
                 if (!coordinates || !cellKeyPath) {
                     const trackingResponse = trackingController.trackCoordinates({ lat, lng }, userId, userData);
                     const { coordinatesResponse, cellKeyPathResponse, countryName } = trackingResponse;
@@ -43,6 +57,16 @@ export default (socket: Socket) => {
                 }
 
                 socket.emit('trackLocationArray', trackingArray);
+            })
+            socket.on('stopTracking', () => {
+                if (cellKeyPath && userId && savedCountryName) {
+                    trackingController.deleteCoordinates(cellKeyPath, savedCountryName, userId);
+                }
+
+                cellKeyPath = undefined;
+                coordinates = undefined;
+                trackingArray = undefined;
+                savedCountryName = undefined;
             })
         } else {
             socket.emit('authenticateSocket', { success: false, message: 'Authentification failed!' })

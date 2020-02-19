@@ -12,6 +12,13 @@ class TrackingController {
     constructor() {
     }
 
+    /**
+     * Start the tracking of the given user Position
+     * @param coordinates an object with lat/lng coordinates
+     * @param id the user ID
+     * @param userData the user data
+     * @returns The saved coordinates object, the path to the cell and the countryName
+     */
     public trackCoordinates({ lat, lng }: Coordinates, id: number, userData: any): { coordinatesResponse: Coordinates, cellKeyPathResponse: string, countryName: string } {
         let coordinates: Coordinates = { lat, lng };
         const countryName: string = countrySearch.get_country(lat, lng).name;
@@ -32,6 +39,12 @@ class TrackingController {
         return { coordinatesResponse: trackingData.coordinates, cellKeyPathResponse: trackingData.cellKeyPath, countryName };
     }
 
+    /**
+     * Get the tracking array of cell objects for the given range and start cell
+     * @param cellKeyPath 
+     * @param countryName 
+     * @param range 
+     */
     public extractTrackingArray(cellKeyPath: string, countryName: string, range: number = 3) {
         const trackingArray = [];
 
@@ -77,6 +90,21 @@ class TrackingController {
         return trackingArray;
     }
 
+    /**
+     * Delete the coordinates of a user from the grid
+     * @param path 
+     * @param countryName 
+     * @param userID 
+     */
+    public deleteCoordinates(path: string, countryName: string, userID: number) {
+        const pathArray: string[] = path.split(':::');
+
+        const columnCell = this.getEntryByPath(pathArray, countryName);
+        if (columnCell[userID]) {
+            delete columnCell[userID];
+        }
+    }
+
     private getGridAndRowByPath(cellKeyPath: string, countryName: string) {
         const pathArray: string[] = cellKeyPath.split(':::');
         const columnIndex: number = parseInt(pathArray.pop());
@@ -88,6 +116,7 @@ class TrackingController {
         return { grid, columnIndex, rowIndex };
     }
 
+    // Returns the grid object for a given path
     private getEntryByPath(pathArray: string[], countryName: string) {
         let tempObject = this.countries[countryName];
 
@@ -138,12 +167,14 @@ class TrackingController {
         }
     }
 
+    // Checks if a certain coordinate is in the boundries of a given coordinate string
     private isKeyInBounds(coordinates, key): boolean {
         const bounds = JSON.parse(key);
 
         return isPointInPolygon(coordinates, bounds);
     }
 
+    // Recursive check to get the column cell which fits to the given user coordinates
     private checkIfInGrid(grid, coordinates) {
         const tempRow: (string | number)[] = [];
 
@@ -182,6 +213,7 @@ class TrackingController {
         this.countries[countryName] = this.createGridLayers(gridLayers, countryGrid);
     }
 
+    // Recursive function to create the serveral grid layers from an given array of layers
     private createGridLayers(layersArray: number[], grid) {
         layersArray = [...layersArray]; // Create a copy
 
@@ -254,6 +286,7 @@ class TrackingController {
         return reducedGrid;
     }
   
+    // Function to get the GPS boundries of an country
     private getCountryDataBounds(countryName: string) {
         const countryData = countryDataObject.country_data.find((country) => {
             return country.properties.name === countryName;

@@ -124,7 +124,7 @@ class MongoDBConnection {
 
         counter++;
 
-        profileObject = Object.assign({}, profileObject);
+        profileObject = Object.assign({ profileImg: '/images/placeholder.svg' }, profileObject);
 
         delete profileObject.password;
 
