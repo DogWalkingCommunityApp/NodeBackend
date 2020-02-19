@@ -19,12 +19,11 @@ export default (app: IExpress) => {
       // Apply socket routes
       socketRoutes(socket);
     });
-    socket.on("sendPrivateMessage", async (data) => {
-      console.log(data);
+    socket.on("sendMessage", async (data) => {
       let userInfos: string[] = data.toString().split(";");
       let message: string = userInfos[0];
       let username: string = userInfos[1];
-      io.of( await mongoDB.getUserID(username)).emit("sendMessage", message);
+      io.of( await mongoDB.getUserID(username)).emit("getMessage", username + ": " + message);
       socketRoutes(socket);
     });
   });
