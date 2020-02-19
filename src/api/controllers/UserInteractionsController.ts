@@ -44,8 +44,6 @@ class UserInteractionsController {
     //         console.dir(reply)
     //     })
     // }
-
-	};
   }
   
   export default UserInteractionsController;
