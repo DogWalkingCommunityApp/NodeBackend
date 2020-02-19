@@ -19,7 +19,7 @@ Aufbau der Datenbank:
                 routes,         -> Daten für die Routen
                 userprofile,    -> Daten für das Profil der User
                 userlogin       -> Daten für die Logindaten der User
-                counter         -> Speichert den ID Counter
+                counter         -> Speichert den UserID Counter
 */
 
 class MongoDBConnection {
@@ -59,7 +59,7 @@ class MongoDBConnection {
             resolver({ connection: dbo, db });
         });
         return response;
-    }
+    };
 
     public doesUserExist = async (username: string, email: string):Promise<boolean> => {
         const { connection, db }:any = await  this.connect();
@@ -87,7 +87,7 @@ class MongoDBConnection {
         db.close();
 
         return await response;
-    }
+    };
 
     public getUserData = async (username: string, email: string):Promise<any> => {
         const { connection, db }:any = await  this.connect();
@@ -129,11 +129,11 @@ class MongoDBConnection {
         delete profileObject.password;
 
         connection.collection("userprofile").insertOne(profileObject);
-        this.updateCounter()
+        this.updateCounter();
 
         db.close();
         return true;
-    }
+    };
 
     public addUserLogin = async (username: string, password: string, email: string):Promise<boolean> => {
         const { connection, db }: any = await this.connect();
@@ -153,7 +153,7 @@ class MongoDBConnection {
 
         db.close();
         return true;
-    }
+    };
 
     /**
      * The function allows for toke  or password authentification
@@ -289,7 +289,7 @@ class MongoDBConnection {
         db.close();
 
         return await response;
-    }
+    };
 
     public updateCounter = async (): Promise<number> => {
         const { connection, db }: any = await this.connect();
@@ -302,6 +302,29 @@ class MongoDBConnection {
 
         db.close();
         return counter;
+    };
+
+    public getUserID = async (username: string): Promise<string> => {
+        const { connection, db }: any = await this.connect();
+        let userID: string;
+
+        connection.collection("userprofile").findOne({
+            $or: [
+                { username: username }
+            ]
+        }, function (err, result) {
+            if (err) throw err;
+            userID = result.id;
+            db.close();
+        });
+
+        if(userID === undefined){
+            userID = "";
+        }
+
+        db.close();
+
+        return await userID;
     }
 /*
 //Inserting documents in a collection

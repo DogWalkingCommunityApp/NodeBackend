@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import MongoDBController from './MongoDBConnection';
 import { LoginObject } from './../types/UserController';
 import mongoDB from './MongoDBConnection';
 import { ValidateRegister } from '../helpers/ValidateRegister';
@@ -14,7 +13,7 @@ class UserInteractionsController {
       const authentification: LoginObject = await mongoDB.authenticate(login, login, password, authId);
       
       res.send(authentification);
-    }
+    };
 
     public register = async (req: Request, res: Response) => {
       if (!ValidateRegister(req.body)) {
@@ -30,7 +29,7 @@ class UserInteractionsController {
       } else {
         res.send({success: false, message: 'User does already exist'})
       }
-    }
+	};
   }
   
   export default UserInteractionsController;

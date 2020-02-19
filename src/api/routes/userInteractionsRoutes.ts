@@ -8,5 +8,5 @@ export default (app: IExpress) => {
       .post(controller.login);
 
   app.route('/register')
-      .post(controller.register)
+      .post(controller.register);
 }
