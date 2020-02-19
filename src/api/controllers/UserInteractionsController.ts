@@ -29,7 +29,6 @@ class UserInteractionsController {
       } else {
         res.send({success: false, message: 'User does already exist'})
       }
-<<<<<<< HEAD
     }
 
     // public passwordForgotten = async (req: Request, res: Response) => {
@@ -46,9 +45,7 @@ class UserInteractionsController {
     //     })
     // }
 
-=======
 	};
->>>>>>> master
   }
   
   export default UserInteractionsController;
