@@ -5,6 +5,7 @@ import { Socket } from 'socket.io';
 import { Server } from 'http';
 import socketRoutes from './socketRoutes';
 import mongoDB from './controllers/MongoDBConnection';
+import profileRoutes from "./routes/profileRoutes";
 
 
 export default (app: IExpress) => {
@@ -29,6 +30,8 @@ export default (app: IExpress) => {
   });
 
     userInteractions(app);
+
+    profileRoutes(app);
 
     return server;
 
