@@ -1,8 +1,11 @@
+import * as fs from "fs";
+
 const jssha = require('jssha');
 const randomString = require('randomstring');
 const defaultValidity: number = 43200;
 import { AuthTokenStore } from '../types/MongoDBController';
 import { LoginObject } from './../types/UserController';
+import { ValidateImageFile } from '../helpers/ValidateImageFile'
 
 const MongoClient = require('mongodb').MongoClient;
 let counter;
@@ -352,6 +355,12 @@ class MongoDBConnection {
         }
     );
 */
+    async updateUserProfilePic(profilePicFile: File) {
+
+
+
+        return true;
+    }
 }
 
 const mongoDB = new MongoDBConnection();
