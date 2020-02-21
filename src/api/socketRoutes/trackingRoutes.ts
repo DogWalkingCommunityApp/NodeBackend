@@ -28,6 +28,8 @@ export default (socket: Socket) => {
                 socket.removeAllListeners();
 
                 socket = undefined;
+
+                mongoDB.updateOnlineStatus(userId, false);
             })
 
             // Start the tracking process for the user coordinates and send the positions of the surrounding cells
@@ -57,6 +59,8 @@ export default (socket: Socket) => {
                     cellKeyPath = cellKeyPathResponse;
                     savedCountryName = countryName;
 
+                    mongoDB.updateOnlineStatus(userId, true);
+
                 } else {
                     coordinates.lat = lat;
                     coordinates.lng = lng;
@@ -79,6 +83,8 @@ export default (socket: Socket) => {
                 coordinates = undefined;
                 trackingArray = undefined;
                 savedCountryName = undefined;
+
+                mongoDB.updateOnlineStatus(userId, false);
             })
         } else {
             socket.emit('authenticateSocket', { success: false, message: 'Authentification failed!' })

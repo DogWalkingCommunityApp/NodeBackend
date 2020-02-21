@@ -4,6 +4,7 @@ import bodyParser = require('body-parser');
 import cors = require('cors');
 
 import Routes from './api/routes';
+import mongoDB from './api/controllers/MongoDBConnection';
 
 const port: number = Number(process.env.PORT) || 3000; // port / default port
 const notifications = [];
@@ -19,8 +20,8 @@ const app: IExpress = Express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const webpush = require('web-push');
-webpush.setVapidDetails('mailto:starwars.98@hotmail.de', PUBLIC_VAPID, PRIVATE_VAPID);
+// Reset visibility on server Startup
+mongoDB.resetOnlineStatus();
 
 app.use('/images', Express.static(__dirname + '/images'));
 
@@ -31,25 +32,7 @@ app.post('/subscription', (req, res) => {
     const subscription = req.body;
     notifications.push(subscription);
 });
-app.post('/sendNotification', (req, res) => {
-    const notificationPayload = {
-        notification: {
-            title: 'New Notification',
-            body: 'This is the body of the notification'
-        },
-    };
 
-
-    notifications.forEach(subscription => {
-        promises.push(
-            webpush.sendNotification(
-                subscription,
-                JSON.stringify(notificationPayload)
-            )
-        )
-    });
-    Promise.all(promises).then(() => res.sendStatus(200))
-});
 // Register all routes
 const server = Routes(app);
 
