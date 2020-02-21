@@ -198,6 +198,28 @@ class MongoDBConnection {
         }
     }
 
+    public updateOnlineStatus = async (id: number, isOnline: boolean):Promise<void> => {
+        const { connection, db }:any = await  this.connect();
+
+        connection.collection("userprofile").updateOne({
+            id: id
+        }, {
+            $set: { visible: isOnline }
+        });
+
+        db.close();
+    };
+
+    public resetOnlineStatus = async ():Promise<void> => {
+        const { connection, db }:any = await  this.connect();
+
+        connection.collection("userprofile").updateMany({}, {
+            $set: { visible: false }
+        });
+
+        db.close();
+    };
+
     private checkAuthToken = (tokenId: string): boolean => {
         let validToken: boolean = false;
         
