@@ -39,9 +39,14 @@ export default (socket: Socket) => {
                     trackingArray = undefined;
                 }
 
+                let gpsKeyFinal
                 if (!coordinates || !cellKeyPath) {
                     const trackingResponse = trackingController.trackCoordinates({ lat, lng }, userId, userData);
-                    const { coordinatesResponse, cellKeyPathResponse, countryName } = trackingResponse;
+                    const { coordinatesResponse, cellKeyPathResponse, countryName, gpsKey } = trackingResponse;
+
+                    if(gpsKey) {
+                        gpsKeyFinal = gpsKey;
+                    }
                     
                     if((trackingResponse as any) === 'Error') {
                         return;
@@ -61,7 +66,7 @@ export default (socket: Socket) => {
                     trackingArray = trackingController.extractTrackingArray(cellKeyPath, savedCountryName);
                 }
 
-                socket.emit('trackLocationArray', trackingArray);
+                socket.emit('trackLocationArray', { trackingArray, gpsKey: gpsKeyFinal });
             })
 
             // When stopping the tracking process, delete the coordinates from the grid and unset the vairables
