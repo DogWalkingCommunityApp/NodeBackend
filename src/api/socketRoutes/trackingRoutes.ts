@@ -11,7 +11,7 @@ export default (socket: Socket) => {
         if (authentification.success) {
             const userId = authentification.data.userData.id;
             const userData = authentification.data.userData;
-            let coordinates, cellKeyPath, trackingArray, savedCountryName;
+            let coordinates, cellKeyPath, trackingArray, savedCountryName, trackingRange;
 
             socket.emit('authenticateSocket', { success: true, message: 'Success!' })
 
@@ -33,7 +33,7 @@ export default (socket: Socket) => {
             })
 
             // Start the tracking process for the user coordinates and send the positions of the surrounding cells
-            socket.on('trackLocation', ({ lat, lng, jumpCell }) => {
+            socket.on('trackLocation', ({ lat, lng, jumpCell, range }) => {
                 if (jumpCell) {
                     trackingController.deleteCoordinates(cellKeyPath, savedCountryName, userId);
                     cellKeyPath = undefined;
@@ -66,8 +66,9 @@ export default (socket: Socket) => {
                     coordinates.lng = lng;
                 }
 
-                if (!trackingArray) {
-                    trackingArray = trackingController.extractTrackingArray(cellKeyPath, savedCountryName);
+                if (!trackingArray || range !== trackingRange) {
+                    trackingRange = range;
+                    trackingArray = trackingController.extractTrackingArray(cellKeyPath, savedCountryName, trackingRange);
                 }
 
                 socket.emit('trackLocationArray', { trackingArray, gpsKey: gpsKeyFinal });
