@@ -19,7 +19,7 @@ class TrackingController {
      * @param userData the user data
      * @returns The saved coordinates object, the path to the cell and the countryName
      */
-    public trackCoordinates({ lat, lng }: Coordinates, id: number, userData: any): { coordinatesResponse: Coordinates, cellKeyPathResponse: string, countryName: string } {
+    public trackCoordinates({ lat, lng }: Coordinates, id: number, userData: any): { coordinatesResponse: Coordinates, cellKeyPathResponse: string, countryName: string, gpsKey: string } {
         let coordinates: Coordinates = { lat, lng };
         const countryName: string = countrySearch.get_country(lat, lng).name;
   
@@ -36,7 +36,7 @@ class TrackingController {
             trackingData = this.addToTracking(coordinates, id, countryName, userData);
         }
 
-        return { coordinatesResponse: trackingData.coordinates, cellKeyPathResponse: trackingData.cellKeyPath, countryName };
+        return { coordinatesResponse: trackingData.coordinates, cellKeyPathResponse: trackingData.cellKeyPath, countryName, gpsKey: trackingData.gpsKey };
     }
 
     /**
@@ -139,15 +139,17 @@ class TrackingController {
         const geoLibCoordinates = { latitude: lat, longitude: lng };
 
 
-        let tempGrid;
+        let tempGrid, tempGpsKey;
         let cellKeyPath: string[] = []; // The cell key path is ued to find the entry without searching for it through the whole tracking array
         // Save 250x250 cell in tempGrid
        
         while(tempGrid === undefined || (tempGrid === undefined || typeof tempGrid === 'object') && Array.isArray(tempGrid)) {
             const isInGridResponse = this.checkIfInGrid(tempGrid ||countryGrid, geoLibCoordinates);
             if (isInGridResponse) {
-                const { pathArray, returnGrid } = isInGridResponse;
+                const { pathArray, returnGrid, gpsKey } = isInGridResponse;
+
                 tempGrid = returnGrid;
+                tempGpsKey = gpsKey;
                 cellKeyPath = [ ...cellKeyPath, ...pathArray];
             } else {
                 tempGrid = false;
@@ -159,11 +161,11 @@ class TrackingController {
         if (!tempGrid) {
             return 'Error';
         } else if (tempGrid[id]) {
-            return { coordinates: tempGrid[id], cellKeyPath: cellKeyPath.join(':::') };
+            return { coordinates: tempGrid[id], cellKeyPath: cellKeyPath.join(':::'), gpsKey: tempGpsKey };
         } else {
             coordinates.userData = userData;
             tempGrid[id] = coordinates;
-            return { coordinates, cellKeyPath: cellKeyPath.join(':::') };
+            return { coordinates, cellKeyPath: cellKeyPath.join(':::'), gpsKey: tempGpsKey };
         }
     }
 
@@ -183,16 +185,16 @@ class TrackingController {
                 const isInGridResponse = this.checkIfInGrid(grid[index], coordinates);
 
                 if (isInGridResponse) {
-                    const { pathArray, returnGrid } = isInGridResponse;
+                    const { pathArray, returnGrid, gpsKey } = isInGridResponse;
 
-                    return { pathArray: [ index, ...pathArray ], returnGrid };
+                    return { pathArray: [ index, ...pathArray ], returnGrid, gpsKey };
                 }
             } else if (typeof grid[index] === 'object') {
                 const { key, data } = grid[index];
 
                 if (this.isKeyInBounds(coordinates, key)) {
                     tempRow[0] = index;
-                    return { pathArray: tempRow, returnGrid: data };
+                    return { pathArray: tempRow, returnGrid: data, gpsKey: key };
                 }
             }
         }
