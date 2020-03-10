@@ -31,6 +31,14 @@ class UserInteractionsController {
       }
     }
 
+    public logout = (req: Request, res: Response) => {
+        const authId = req.body.authId;
+
+        const message = mongoDB.logout(authId);
+
+        res.send(message);
+    }
+
     // public passwordForgotten = async (req: Request, res: Response) => {
     //     const sendmail = require('sendmail')({silent: true})
     //
