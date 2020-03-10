@@ -326,6 +326,29 @@ class MongoDBConnection {
 
         return await userID;
     }
+
+    public getUserName = async (userId: number): Promise<string> => {
+        const { connection, db }: any = await this.connect();
+        let userName: string;
+
+        connection.collection("userprofile").findOne({
+            $or: [
+                { "id": userId }
+            ]
+        }, function (err, result) {
+            if (err) throw err;
+            userName = result.username;
+            db.close();
+        });
+
+        if(userName === undefined){
+            userName = "";
+        }
+
+        db.close();
+
+        return await userName;
+    }
 /*
 //Inserting documents in a collection
     //Use the insertOne method to insert a document
