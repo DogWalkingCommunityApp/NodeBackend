@@ -220,6 +220,27 @@ class MongoDBConnection {
         db.close();
     };
 
+    public getFriends = async (friends: (string | number)[]): Promise<any[]> => {
+        const { connection, db }:any = await  this.connect();
+
+        let resolver, rejecter;
+
+        const response:Promise<any> = new Promise((res, rej) => resolver = res);
+
+        connection.collection("userprofile").find({
+            id: {
+                $in: friends || []
+            }
+        }, function (err, result) {
+            if (err) throw err;
+                resolver(result.toArray());
+        });
+
+        db.close();
+
+        return await response;
+    }
+
     private checkAuthToken = (tokenId: string): boolean => {
         let validToken: boolean = false;
         
