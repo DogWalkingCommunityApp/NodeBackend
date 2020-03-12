@@ -10,7 +10,8 @@ export default (app: IExpress) => {
   app.route('/register')
       .post(controller.register);
 
-
+  app.route('/logout')
+      .post(controller.logout);
 
   // app.route('/passwordForgotten')
   //     .post(controller.passwordForgotten)
