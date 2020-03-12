@@ -128,6 +128,8 @@ class MongoDBConnection {
 
         delete profileObject.password;
 
+        profileObject.friends = [];
+
         connection.collection("userprofile").insertOne(profileObject);
         this.updateCounter();
 
