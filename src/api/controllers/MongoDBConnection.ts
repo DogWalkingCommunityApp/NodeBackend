@@ -128,6 +128,8 @@ class MongoDBConnection {
 
         delete profileObject.password;
 
+        profileObject.friends = [];
+
         connection.collection("userprofile").insertOne(profileObject);
         this.updateCounter();
 
@@ -198,11 +200,29 @@ class MongoDBConnection {
         }
     }
 
-    public updateOnlineStatus = async (id: number, isOnline: boolean):Promise<void> => {
+    // TODO: Type ME!
+    public logout = (authTokenId: string): any => {
+        const token = this.authStore[authTokenId];
+        if (token) {
+            const username = token.username;
+            this.updateOnlineStatus(username, false);
+
+            delete this.authStore[authTokenId];
+
+            return { success: true, message: 'Logged out Successfully!' };
+        }
+
+        return { success: false, message: 'User not logged in.' };
+    }
+
+    public updateOnlineStatus = async (identifier: (number | string), isOnline: boolean):Promise<void> => {
         const { connection, db }:any = await  this.connect();
 
         connection.collection("userprofile").updateOne({
-            id: id
+            $or: [
+                { username: identifier },
+                { id: identifier }
+            ]
         }, {
             $set: { visible: isOnline }
         });
@@ -220,9 +240,30 @@ class MongoDBConnection {
         db.close();
     };
 
+    public getFriends = async (friends: (string | number)[]): Promise<any[]> => {
+        const { connection, db }:any = await  this.connect();
+
+        let resolver, rejecter;
+
+        const response:Promise<any> = new Promise((res, rej) => resolver = res);
+
+        connection.collection("userprofile").find({
+            id: {
+                $in: friends || []
+            }
+        }, function (err, result) {
+            if (err) throw err;
+                resolver(result.toArray());
+        });
+
+        db.close();
+
+        return await response;
+    }
+
     private checkAuthToken = (tokenId: string): boolean => {
         let validToken: boolean = false;
-        
+
         if (this.authStore[tokenId]) {
             const token = this.authStore[tokenId];
             const currentTime = new Date().getTime()/1000;
@@ -248,7 +289,7 @@ class MongoDBConnection {
             email,
             selfDestructHandler: (setTimeout(() => {
                 delete this.authStore[authId];
-            }, defaultValidity*1000) as unknown as number) 
+            }, defaultValidity*1000) as unknown as number)
         }
 
         this.authStore[authId] = authToken;
@@ -277,7 +318,7 @@ class MongoDBConnection {
                 const correctPassword: boolean = shaObj.getHash('HEX');
 
                 if (correctPassword === result.password) {
-                    resolver({ success: true, message: 'Login successful' });    
+                    resolver({ success: true, message: 'Login successful' });
                 } else {
                     resolver({ success: false, message: 'Wrong password' });
                 }
@@ -330,15 +371,21 @@ class MongoDBConnection {
         const { connection, db }: any = await this.connect();
         let userID: string;
 
+        let resolver, rejecter;
+
+        const response:Promise<string> = new Promise((res, rej) => resolver = res);
+
         connection.collection("userprofile").findOne({
             $or: [
                 { username: username }
             ]
         }, function (err, result) {
             if (err) throw err;
-            userID = result.id;
+            resolver(result.id);
             db.close();
         });
+
+        userID = await response;
 
         if(userID === undefined){
             userID = "";
@@ -346,7 +393,7 @@ class MongoDBConnection {
 
         db.close();
 
-        return await userID;
+        return userID;
     }
 
     public getUserName = async (userId: number): Promise<string> => {
