@@ -1,4 +1,5 @@
 import  userInteractions from './routes/userInteractionsRoutes';
+import  dogInteractions from './routes/dogIneractionsRoutes';
 import { Express as IExpress } from 'express';
 import * as SocketIO from 'socket.io';
 import { Socket } from 'socket.io';
@@ -21,6 +22,7 @@ export default (app: IExpress) => {
   });
 
     userInteractions(app);
+    dogInteractions(app);
 
     return server;
 
