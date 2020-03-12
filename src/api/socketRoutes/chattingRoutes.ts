@@ -13,7 +13,6 @@ export default (socket: Socket, io) => {
         if(toUserId != undefined){
             socketMapping.add(toUserId, socket.id);
             socketId = socketMapping.getSocketId(toUserId);
-            console.log(socketId);
             if(socket != undefined){
                 io.to(socketId).emit("getMessage", fromUserName + ": " + message);
             }
