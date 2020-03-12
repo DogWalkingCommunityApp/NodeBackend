@@ -1,6 +1,5 @@
 import { Socket } from 'socket.io';
 import socketMapping from './../controllers/SocketMappingController';
-import mongoDB from './../controllers/MongoDBConnection';
 
 export default (socket: Socket, io) => {
 
