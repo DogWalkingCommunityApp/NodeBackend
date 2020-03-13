@@ -367,13 +367,13 @@ class MongoDBConnection {
         return counter;
     };
 
-    public getUserID = async (username: string): Promise<string> => {
+    public getUserID = async (username: string): Promise<number> => {
         const { connection, db }: any = await this.connect();
-        let userID: string;
+        let userID: number;
 
         let resolver, rejecter;
 
-        const response:Promise<string> = new Promise((res, rej) => resolver = res);
+        const response:Promise<number> = new Promise((res, rej) => resolver = res);
 
         connection.collection("userprofile").findOne({
             $or: [
@@ -388,13 +388,13 @@ class MongoDBConnection {
         userID = await response;
 
         if(userID === undefined){
-            userID = "";
+            userID = -1;
         }
 
         db.close();
 
         return userID;
-    }
+    };
 
     public getUserName = async (userId: number): Promise<string> => {
         const { connection, db }: any = await this.connect();

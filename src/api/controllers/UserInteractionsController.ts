@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { LoginObject } from './../types/UserController';
 import mongoDB from './MongoDBConnection';
 import { ValidateRegister } from '../helpers/ValidateRegister';
+import socketMapping from "./SocketMappingController";
 
 class UserInteractionsController {
+
     constructor() {
     }
   
@@ -11,7 +13,7 @@ class UserInteractionsController {
       const { login, password, authId } = req.body;
 
       const authentification: LoginObject = await mongoDB.authenticate(login, login, password, authId);
-      
+
       res.send(authentification);
     };
 
@@ -31,10 +33,13 @@ class UserInteractionsController {
       }
     }
 
-    public logout = (req: Request, res: Response) => {
+    public logout = async (req: Request, res: Response) => {
         const authId = req.body.authId;
 
         const message = mongoDB.logout(authId);
+
+        const userId = await mongoDB.getUserID(req.body.login);
+        socketMapping.remove(userId);
 
         res.send(message);
     }
