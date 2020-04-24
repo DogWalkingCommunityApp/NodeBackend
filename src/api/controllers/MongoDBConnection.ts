@@ -3,7 +3,7 @@ const randomString = require('randomstring');
 const defaultValidity: number = 43200;
 import { AuthTokenStore } from '../types/MongoDBController';
 import { LoginObject } from './../types/UserController';
-
+import { DogObject } from './../types/DogController';
 const MongoClient = require('mongodb').MongoClient;
 let counter;
 
@@ -156,6 +156,70 @@ class MongoDBConnection {
         db.close();
         return true;
     };
+
+    public addDogToUser = async (dogObject):Promise<boolean> => {
+        const { connection, db }: any = await this.connect();
+        console.log(dogObject)
+        //const tempID = "5e674c44b9c115366c80319b";
+
+        connection.collection("userprofile").insertOne(dogObject);
+
+      /*  connection.collection("userprofile").updateOne(
+            {_id:tempID},{
+                $set:{
+                    dogs:{
+                        dogName:dogObject.dogName,
+                        dogAge:dogObject.dogAge,
+                        dogRace:dogObject.dogRace,
+                        dogSize:dogObject.dogSize,
+                        dogDescription:dogObject.dogDescription,
+                        dogGender:dogObject.dogGender,
+                        neutered:dogObject.neutered
+                    }
+                }
+            });*/
+
+        db.close();
+        return true;
+    };
+
+
+    public getDogFromUser = async ():Promise<boolean> => {
+        const { connection, db }: any = await this.connect();
+
+        let resolver, rejecter;
+
+        const response:Promise<boolean> = new Promise((res, rej) => resolver = res);
+
+        connection.collection("userprofile").findOne({
+
+        }, function (err, result) {
+            if (err) throw err;
+
+            if (result)
+            {
+                resolver(result);
+            } else {
+                resolver(false);
+            }
+        });
+
+        db.close();
+        return await response;
+    };
+
+
+
+    /*  public updateDogFromUser = async (userId, dogName, dogAge?, dogRace?, dogSize?, dogDescription?, dogGender?, neutered?):Promise<boolean> => {
+
+      };
+
+      public deleteDogFromUser = async (userId, dogName):Promise<boolean> => {
+
+      };
+  */
+
+
 
     /**
      * The function allows for toke  or password authentification
