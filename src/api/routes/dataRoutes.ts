@@ -6,4 +6,7 @@ export default (app: IExpress) => {
 
   app.route('/getFriends')
       .post(controller.getFriends);
+     
+  app.route('/getUserData')
+      .post(controller.getUserData);
 }

@@ -13,6 +13,15 @@ class DataController {
       }
       res.send(message);
     }
-  }
-  
-  export default DataController;
+
+    public getUserData = async (req: Request, res: Response) => {
+      const userData = await mongoDB.getUserData(req.body.identifier, req.body.identifier, req.body.identifier);
+      const message = {
+          success: userData !== null,
+          data: userData
+      }
+      res.send(message);
+    }
+} 
+
+export default DataController;

@@ -89,7 +89,7 @@ class MongoDBConnection {
         return await response;
     };
 
-    public getUserData = async (username: string, email: string):Promise<any> => {
+    public getUserData = async (username: string, email: string, id?:number):Promise<any> => {
         const { connection, db }:any = await  this.connect();
 
         let resolver, rejecter;
@@ -99,12 +99,13 @@ class MongoDBConnection {
         connection.collection("userprofile").findOne({
             $or: [
                 { username: username },
-                { email: email }
+                { email: email },
+                { id: id }
             ]
         }, function (err, result) {
             if (err) throw err;
-
-            if (result && (result.username === username || result.email === email))
+            console.log(result)
+            if (result && (result.username === username || result.email === email || result.id === id))
             {
                 resolver(result);
             } else {
